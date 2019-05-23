@@ -1,5 +1,5 @@
 console.log('function started');
-var textValue,tdate,selector='[ng-class*="formName.scheduleStart"]';
+var textValue,actualNode,duplicateNode,tdate,selector='[ng-class*="formName.scheduleStart"]';
 function checkFlag() {
     if(!$(selector+' [class="uib-daypicker"]').is(":visible")) {
        window.setTimeout(checkFlag, 100); /* this checks the flag every 100 milliseconds*/
@@ -45,6 +45,11 @@ function checkFlag() {
         }
        
           if (isValid(tdate)) {
+            if(duplicateNode&&actualNode&&document.querySelector('[id*="letznaverror"]'))
+            {
+                $(selector+' [id*="letznaverror"]').remove();
+                duplicateNode.parentNode.replaceChild(actualNode, duplicateNode);
+            }
               handleDateClicks(textValue, list, dupList, HasClass);
               // aditionally do error handling
           } else {
@@ -93,11 +98,14 @@ function checkTheAddition() {
   } else {
   //  document.querySelector(selector+' [class*="date-picker-input"]').setAttribute('readonly',true);
   //  document.querySelector(selector+' [class*="date-picker-input"]').setAttribute('style',"color:rgba(1,1,1,1)");
-   $(selector+' [class*="date-picker-input"]').on('click',function(){
+   $(selector+' [class*="date-picker-input"]').on('click input',function(){
     $(selector+' [class="btn btn-sm btn-success pull-right uib-close"]').click();
-    start();
+    validateTextField(selector+' [class*="date-picker-input"]', isValid, 'Date must be less than Dec 07 2018', 'letznaverror_date');
    });
     $(selector+' [ng-click="datepickerCntl.isFocused = true; datepickerCntl.open($event)"]').on('click', function() {
+        //actualNode.value = duplicateNode.value;
+        // if(duplicateNode&&actualNode&&document.querySelector('[id*="letznaverror"]'))
+        // duplicateNode.parentNode.replaceChild(actualNode, duplicateNode);
   checkFlag();
 })
   }
@@ -107,4 +115,58 @@ function isValid(tdate){
   if(tdate<new Date('07 December 2018'))
   return true;
  else return false;
+}
+
+
+///////////////////////////////////Input field validation starts/////////////////////////////////////////////////
+
+
+
+function validateTextField(selector, validationFunction, errorMessage, errorIdentification) 
+{
+
+    actualNode = document.querySelector(selector);
+    duplicateNode = actualNode.cloneNode();
+
+    actualNode.parentNode.replaceChild(duplicateNode, actualNode);
+    $(selector).focus();
+
+    $(selector).on('blur', function () {
+
+        var errorIdentifier = $('#' + errorIdentification);
+        if (validationFunction(new Date(document.querySelector(selector).value))) {
+            actualNode.value = duplicateNode.value;
+            duplicateNode.parentNode.replaceChild(actualNode, duplicateNode);
+            // $(this).unbind();
+            triggerChange(actualNode, duplicateNode);
+            errorIdentifier.remove();
+
+            //$(this).focus();
+            $(this).off('keyup');
+        } else {
+            if (errorIdentifier.length === 0) {
+                displayErrorMessage(errorMessage, selector, errorIdentification);
+            }
+        }
+
+    })
+}
+function triggerChange(selector, dupSelector) 
+{
+    console.log('Trigger change executed');
+    var evt = document.createEvent('KeyboardEvent');
+    evt.initEvent('change', true, true);
+    selector.dispatchEvent(evt);
+    var evt2 = document.createEvent('KeyboardEvent');
+    evt2.initEvent('blur', true, true);
+    selector.dispatchEvent(evt2);
+}
+
+function displayErrorMessage(errorMessage, selector, errorIdentification) {
+    var mess = errorMessage;
+    var errorMessage = document.createElement("p");
+    errorMessage.innerHTML = mess ;
+    errorMessage.setAttribute('style', 'color:red');
+    errorMessage.setAttribute('id', errorIdentification);
+    $(errorMessage).insertAfter(selector)
 }
