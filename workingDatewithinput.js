@@ -1,98 +1,85 @@
+console.log('function started');
+var textValue,tdate,selector='[ng-class*="formName.scheduleStart"]';
 function checkFlag() {
-    console.log('In function checkFlag');
-    if(!$('[class="uib-daypicker"]').is(":visible")) {
+    if(!$(selector+' [class="uib-daypicker"]').is(":visible")) {
        window.setTimeout(checkFlag, 100); /* this checks the flag every 100 milliseconds*/
     } else {
       /* do something*/
-      var list = document.querySelector('[class="uib-daypicker"]');
+      var list = document.querySelector(selector+' [class="uib-daypicker"]');
       var dupList = list.cloneNode(true);
        
       list.parentNode.replaceChild(dupList, list);
-      console.log('duplication done')
 
-      $('[class="btn btn-default btn-sm pull-right uib-right"]').on('click', function(){
-          console.log('I am gng here');
+      $(selector+' [class="btn btn-default btn-sm pull-right uib-right"]').on('click', function(){
           handleClicks('right', list, dupList);
       })
 
-      $('[class="btn btn-default btn-sm pull-left uib-left"]').on('click', function(){
-        console.log('towards left');
+      $(selector+' [class="btn btn-default btn-sm pull-left uib-left"]').on('click', function(){
         handleClicks('left', list, dupList);
       })
-      $('[class="btn btn-default btn-sm uib-title"]').on('click',function(){
-          console.log('clicked month');
-        //   var list = document.querySelector('[class="uib-daypicker"]');
-        //   var dupList = list.cloneNode(true);
+      $(selector+' [class="btn btn-default btn-sm uib-title"]').on('click',function(){
           dupList.parentNode.replaceChild(list, dupList);
-          var month=document.querySelector('[class="uib-monthpicker"]');
-        //   var dupmonth=month.cloneNode(true);
+          var month=document.querySelector(selector+' [class="uib-monthpicker"]');
           handleMonths(month);
       })
 
-      $('[class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]').on('click', function(){
-        var textValue = $(this)[0].innerText;
-        console.log(textValue);
-          if ((textValue=="01" ||textValue=="31")&& document.querySelector('button[id*="datepicker"]').innerText==="April 2019") {
-            //document.querySelector('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').removeAttribute('disabled');
-              handleDateClicks(textValue, list, dupList);
+      $(selector+' [class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]').on('click', function(){
+        textValue = $(this)[0].innerText;
+        tdate=new Date(document.querySelector(selector+' button[id*="datepicker"]').innerText);
+        tdate=new Date(tdate.setDate(textValue));
+        var HasClass = $(this).children("span").hasClass('text-muted');
+        if($(this).children("span").hasClass('text-muted'))
+        {
+          console.log('This is Muted value');
+          if(parseInt(textValue)>15)
+          {
+          //  tdate=new Date(document.querySelector(selector+' button[id*="datepicker"]').innerText);
+           tdate=new Date(tdate.setMonth(tdate.getMonth()-1));
+          //  tdate=new Date(tdate.setDate(textValue));
+          }
+          else 
+          {
+          // tdate=new Date(document.querySelector(selector+' button[id*="datepicker"]').innerText);
+          tdate=new Date(tdate.setMonth(tdate.getMonth()+1));
+          }
+        }
+       
+          if (isValid(tdate)) {
+              handleDateClicks(textValue, list, dupList, HasClass);
               // aditionally do error handling
           } else {
-              console.log('wrong date');
               // handle error
-              $('[class="btn btn-sm btn-success pull-right uib-close"]').click();
-                //document.querySelector('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').setAttribute('disabled',true);
-               // when you open a date picker you will find a close button at the bottom
-               //this selector will refer to that button for closing the picker
+              $(selector+' [class="btn btn-sm btn-success pull-right uib-close"]').click();
           }
       })
 }
 }
-
-
-console.log('first visibility ', $('input[name="workStatus"]').is(":visible"));
-
 function handleClicks(direction, original, cloned) {
-    console.log('In function handleClicks');
     cloned.parentNode.replaceChild(original, cloned);
     if (direction === 'right') {
-        $('[class="btn btn-default btn-sm pull-right uib-right"]').click()
+        $(selector+' [class="btn btn-default btn-sm pull-right uib-right"]').click()
     } else {
-        $('[class="btn btn-default btn-sm pull-left uib-left"]').click()
+        $(selector+' [class="btn btn-default btn-sm pull-left uib-left"]').click()
     }
-    // var list = document.querySelector('[class="uib-daypicker"]');
-    // var dupList = list.cloneNode(true);
-    // list.parentNode.replaceChild(dupList, list);
     checkFlag();
 }
 function handleMonths() {
-    console.log('In function handleMonths');
-    // cloned.parentNode.replaceChild(original, cloned);
-    $('[class="btn btn-default btn-sm uib-title"]').click();
+    $(selector+' [class="btn btn-default btn-sm uib-title"]').click();
 
-$('[class="uib-monthpicker"]').on('click',function(){
-    console.log('NEw Month clicked');
+$(selector+' [class="uib-monthpicker"]').on('click',function(){
     checkFlag();
 })    
 
-
-    //checkFlag();
 }
 
-function handleDateClicks(dateValue, list, dupList) {
-    console.log('In function handleDateClicks');
-    var dateList = document.querySelectorAll('[class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]');
+function handleDateClicks(dateValue, list, dupList, HasClass) {
+    var dateList = document.querySelectorAll(selector+' [class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]');
     for (var i = 0; i < dateList.length; i++) {
-        if (dateList[i].innerText === dateValue) {
-            console.log('so finally smtg got clicked');
-            // var list = document.querySelector('[class="uib-daypicker"]');
-            // var dupList = list.cloneNode(true);
-            console.log('lists inc', list);
-            console.log('dup inc ', dupList.parentNode);
+      //console.log('has', $(dateList[i]).children("span").hasClass('text-muted'), HasClass);
+        if (dateList[i].innerText === dateValue && $(dateList[i]).children("span").hasClass('text-muted') === HasClass) {
+          console.log('found the clicked value at ',i, dateList[i].innerText, dateValue, $(dateList[i]).children("span").hasClass('text-muted'), HasClass)
             dupList.parentNode.replaceChild(list, dupList);
-            console.log('before doubt i value is ',i);
-            document.querySelectorAll('[class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]')[i].click();
-            //document.querySelector('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').setAttribute('disabled',true);
-            console.log('after doubt');
+            document.querySelectorAll(selector+' [class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]')[i].click();
             break;
         }
     }
@@ -101,27 +88,22 @@ function handleDateClicks(dateValue, list, dupList) {
 
 
 function checkTheAddition() {
-    console.log('In function checkTheAddition');
   if(!$('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').is(":visible")) {
    window.setTimeout(checkTheAddition, 100);
   } else {
-   //document.querySelector('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').setAttribute('disabled',true);
-   document.querySelector('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').setAttribute('readonly',true);
-   $('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').on('click',function(){
-   //document.querySelector('[ng-class*="formName.scheduleStart"] [class*="date-picker-input"]').setAttribute('disabled',true);
+  //  document.querySelector(selector+' [class*="date-picker-input"]').setAttribute('readonly',true);
+  //  document.querySelector(selector+' [class*="date-picker-input"]').setAttribute('style',"color:rgba(1,1,1,1)");
+   $(selector+' [class*="date-picker-input"]').on('click',function(){
+    $(selector+' [class="btn btn-sm btn-success pull-right uib-close"]').click();
    });
-    $('[ng-class*="formName.scheduleStart"] [ng-click="datepickerCntl.isFocused = true; datepickerCntl.open($event)"]').on('click', function() {
-  console.log('got clicked');
-  
-  document.querySelectorAll('[ng-init="targetCtrl = $parent.lookupCntl"]')[1].setAttribute('id', 'theworkflowstatus');
-  
-//   var original = document.querySelector('[id="theworkflowstatus"]');
-  console.log('focus happens btw');
-  checkFlag()
- // list.parentNode.replaceChild(dupList, list);
-    console.log('dear got added')
+    $(selector+' [ng-click="datepickerCntl.isFocused = true; datepickerCntl.open($event)"]').on('click', function() {
+  checkFlag();
 })
   }
 }
-
 checkTheAddition()
+function isValid(tdate){
+  if(tdate<new Date('07 December 2018'))
+  return true;
+ else return false;
+}
