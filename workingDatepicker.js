@@ -95,6 +95,7 @@ function checkTheAddition() {
   //  document.querySelector(selector+' [class*="date-picker-input"]').setAttribute('style',"color:rgba(1,1,1,1)");
    $(selector+' [class*="date-picker-input"]').on('click',function(){
     $(selector+' [class="btn btn-sm btn-success pull-right uib-close"]').click();
+    start();
    });
     $(selector+' [ng-click="datepickerCntl.isFocused = true; datepickerCntl.open($event)"]').on('click', function() {
   checkFlag();
