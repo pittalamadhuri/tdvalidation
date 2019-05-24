@@ -9,6 +9,7 @@ function checkFlag() {
 
       list.parentNode.replaceChild(dupList, list);
       console.log('duplication done')
+      //testing change
 
       $('[class="btn btn-default btn-sm pull-right uib-right"]').on('click', function(){
           handleClicks('right', list, dupList);
