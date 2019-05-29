@@ -9,16 +9,16 @@ function checkFlag(selector,identifier,errorIdentification) {
       var dupList = list.cloneNode(true);
       list.parentNode.replaceChild(dupList, list);
       $(selector+' [class="btn btn-default btn-sm pull-right uib-right"]').on('click', function(){
-          handleClicks(selector,'right', list, dupList);
+          handleClicks(selector,identifier,errorIdentification,'right', list, dupList);
       })
 
       $(selector+' [class="btn btn-default btn-sm pull-left uib-left"]').on('click', function(){
-        handleClicks(selector,'left', list, dupList);
+        handleClicks(selector,identifier,errorIdentification,'left', list, dupList);
       })
       $(selector+' [class="btn btn-default btn-sm uib-title"]').on('click',function(){
           dupList.parentNode.replaceChild(list, dupList);
           var month=document.querySelector(selector+' [class="uib-monthpicker"]');
-          handleMonths(month);
+          handleMonths(selector,identifier,errorIdentification);
       })
 
       $(selector+' [class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]').on('click', function(){
@@ -45,14 +45,14 @@ function checkFlag(selector,identifier,errorIdentification) {
                 $(selector+' [id*='+errorIdentification+']').remove();
                 duplicateNode.parentNode.replaceChild(actualNode, duplicateNode);
             }
-              handleDateClicks(textValue, list, dupList, HasClass);
+              handleDateClicks(selector,textValue, list, dupList, HasClass);
           } else {
               $(selector+' [class="btn btn-sm btn-success pull-right uib-close"]').click();
           }
       })
 }
 }
-function handleClicks(selector,direction, original, cloned) {
+function handleClicks(selector,identifier,errorIdentification,direction, original, cloned) {
     console.log('In handleClicks()');
     cloned.parentNode.replaceChild(original, cloned);
     if (direction === 'right') {
@@ -62,7 +62,7 @@ function handleClicks(selector,direction, original, cloned) {
     }
     checkFlag(selector,identifier,errorIdentification);
 }
-function handleMonths() {
+function handleMonths(selector,identifier,errorIdentification) {
     console.log('In handleMonths()');
     $(selector+' [class="btn btn-default btn-sm uib-title"]').click();
 
@@ -72,7 +72,7 @@ $(selector+' [class="uib-monthpicker"]').on('click',function(){
 
 }
 
-function handleDateClicks(dateValue, list, dupList, HasClass) {
+function handleDateClicks(selector,dateValue, list, dupList, HasClass) {
     console.log('In handleDateClicks');
     var dateList = document.querySelectorAll(selector+' [class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]');
     for (var i = 0; i < dateList.length; i++) {
@@ -89,20 +89,22 @@ function handleDateClicks(dateValue, list, dupList, HasClass) {
 
 function dateValidation(selector,identifier,errorText,errorIdentification) {
     console.log('In dateValidation()');
+    console.log('and selector is ',selector);
   if(!$('[ng-class*="formName.scheduleStart"]').is(":visible")) {
-   window.setTimeout(dateValidation, 100);
+   window.setTimeout(dateValidation(selector,identifier,errorText,errorIdentification), 100);
   } else {
+      console.log(selector);
    $(selector+' [class*="date-picker-input"]').on('click input',function(){
     $(selector+' [class="btn btn-sm btn-success pull-right uib-close"]').click();
-    validateTextField(selector+' [class*="date-picker-input"]', isValid(selector,identifier), errorText, errorIdentification);
+    validateTextField(selector+' [class*="date-picker-input"]',identifier, isValid, errorText, errorIdentification);
    });
     $(selector+' [ng-click="datepickerCntl.isFocused = true; datepickerCntl.open($event)"]').on('click', function() {
   checkFlag(selector,identifier,errorIdentification);
 })
   }
 }
-dateValidation('[ng-class*="formName.scheduleStart"]', 1,'Date must be less than Dec 07 2018','letznaverror_date');
-
+dateValidation('[ng-class*="formName.scheduleStart"]', 1,'Date must be less than Dec 07 2018','letznaverror_startdate');
+dateValidation('[ng-class*="formName.scheduleFinish"]', 2,'Date must be more than Dec 07 2018','letznaverror_enddate');
 
 
 
@@ -111,16 +113,19 @@ function isValid(tdate, identifier){
  return wheremylogicisthere(tdate,identifier);
 }
 
-function wheremylogicisthere() {
+function wheremylogicisthere(tdate,identifier) {
     console.log('In wheremylogicsthere()');
     switch(identifier){
         case 1:     if(tdate<new Date('07 December 2018')){
-            console.log('return true');
+                    console.log('return true');
                     return true;
-        }
+                    }
                     else 
                     return false;
                     break;
+        case 2: if(tdate>new Date('07 December 2018'))
+                return true; 
+                else return false;
     }
 }
 
@@ -129,7 +134,7 @@ function wheremylogicisthere() {
 
 
 
-function validateTextField(selector, validationFunction, errorMessage, errorIdentification) 
+function validateTextField(selector,identifier, validationFunction, errorMessage, errorIdentification) 
 {
     console.log('In validateTextField()');
     actualNode = document.querySelector(selector);
@@ -141,7 +146,7 @@ function validateTextField(selector, validationFunction, errorMessage, errorIden
     $(selector).on('blur', function () {
 
         var errorIdentifier = $('#' + errorIdentification);
-        if (validationFunction(new Date(document.querySelector(selector).value))) {
+        if (validationFunction(new Date(document.querySelector(selector).value),identifier)) {
             actualNode.value = duplicateNode.value;
             duplicateNode.parentNode.replaceChild(actualNode, duplicateNode);
             triggerChange(actualNode, duplicateNode);

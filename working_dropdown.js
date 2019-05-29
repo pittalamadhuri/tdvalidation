@@ -5,6 +5,7 @@ function startValidation(inputSelector, listidentifier) {
     } 
     else 
     {
+        console.log('Hi')
         var list = document.querySelector(`[id="${listidentifier}"]`);    
         var prevValue = document.querySelector('input[name="workStatus"]').value;
         var dupList = document.querySelector(`[id="${listidentifier}"]`).cloneNode(true)
