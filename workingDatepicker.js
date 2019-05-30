@@ -1,5 +1,5 @@
 console.log('Execution started');
-var textValue,actualNode,duplicateNode,tdate,identifier;
+var actualNode,duplicateNode;
 function checkFlag(selector,identifier,errorIdentification) {
     console.log('In Checkflag()');
     if(!$(selector+' [class="uib-daypicker"]').is(":visible")) {
@@ -22,8 +22,8 @@ function checkFlag(selector,identifier,errorIdentification) {
       })
 
       $(selector+' [class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]').on('click', function(){
-        textValue = $(this)[0].innerText;
-        tdate=new Date(document.querySelector(selector+' button[id*="datepicker"]').innerText);
+        var textValue = $(this)[0].innerText;
+        var tdate=new Date(document.querySelector(selector+' button[id*="datepicker"]').innerText);
         tdate=new Date(tdate.setDate(textValue));
         var HasClass = $(this).children("span").hasClass('text-muted');
         if($(this).children("span").hasClass('text-muted'))
@@ -71,7 +71,6 @@ $(selector+' [class="uib-monthpicker"]').on('click',function(){
 })    
 
 }
-
 function handleDateClicks(selector,dateValue, list, dupList, HasClass) {
     console.log('In handleDateClicks');
     var dateList = document.querySelectorAll(selector+' [class="uib-daypicker"] tbody [class*="btn btn-default btn-sm"]');
@@ -84,12 +83,7 @@ function handleDateClicks(selector,dateValue, list, dupList, HasClass) {
         }
     }
 }
-
-
-
 function dateValidation(selector,identifier,errorText,errorIdentification) {
-    console.log('In dateValidation()');
-    console.log('and selector is ',selector);
   if(!$('[ng-class*="formName.scheduleStart"]').is(":visible")) {
    window.setTimeout(dateValidation(selector,identifier,errorText,errorIdentification), 100);
   } else {
@@ -103,37 +97,10 @@ function dateValidation(selector,identifier,errorText,errorIdentification) {
 })
   }
 }
-dateValidation('[ng-class*="formName.scheduleStart"]', 1,'Date must be less than Dec 07 2018','letznaverror_startdate');
-dateValidation('[ng-class*="formName.scheduleFinish"]', 2,'Date must be more than Dec 07 2018','letznaverror_enddate');
-
-
-
 function isValid(tdate, identifier){
     console.log('In isValid()');
  return wheremylogicisthere(tdate,identifier);
 }
-
-function wheremylogicisthere(tdate,identifier) {
-    console.log('In wheremylogicsthere()');
-    switch(identifier){
-        case 1:     if(tdate<new Date('07 December 2018')){
-                    console.log('return true');
-                    return true;
-                    }
-                    else 
-                    return false;
-                    break;
-        case 2: if(tdate>new Date('07 December 2018'))
-                return true; 
-                else return false;
-    }
-}
-
-
-///////////////////////////////////Input field validation starts/////////////////////////////////////////////////
-
-
-
 function validateTextField(selector,identifier, validationFunction, errorMessage, errorIdentification) 
 {
     console.log('In validateTextField()');
@@ -171,7 +138,6 @@ function triggerChange(selector, dupSelector)
     evt2.initEvent('blur', true, true);
     selector.dispatchEvent(evt2);
 }
-
 function displayErrorMessage(errorMessage, selector, errorIdentification) {
     console.log('In displayErrorMessage()');
     var mess = errorMessage;
@@ -181,3 +147,26 @@ function displayErrorMessage(errorMessage, selector, errorIdentification) {
     errorMessage.setAttribute('id', errorIdentification);
     $(errorMessage).insertAfter(selector)
 }
+
+/////////////////////////////////////Do not change anything above///////////////////////////////////////////////
+
+//The below function is for the date logics
+function wheremylogicisthere(tdate,identifier) {
+    console.log('In wheremylogicsthere()');
+    switch(identifier){
+        case 1:     if(tdate<new Date('07 December 2018')){
+                    console.log('return true');
+                    return true;
+                    }
+                    else 
+                    return false;
+                    break;
+        case 2: if(tdate>new Date('07 December 2018'))
+                return true; 
+                else return false;
+    }
+}
+
+//Below is to attach validations to Date fields
+dateValidation('[ng-class*="formName.scheduleStart"]', 1,'Date must be less than Dec 07 2018','letznaverror_startdate');
+dateValidation('[ng-class*="formName.scheduleFinish"]', 2,'Date must be more than Dec 07 2018','letznaverror_enddate');
