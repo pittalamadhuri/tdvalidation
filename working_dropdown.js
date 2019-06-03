@@ -1,11 +1,10 @@
 function startValidation(inputSelector, listidentifier) {
     if (!$(`[id="${listidentifier}"] li`).is(":visible"))
     {    
-        window.setTimeout(startValidation, 100, inputSelector, listidentifier); /* this checks the flag every 100 milliseconds*/
+        window.setTimeout(startValidation, 100, inputSelector, listidentifier);
     } 
     else 
     {
-        console.log('Hi')
         var list = document.querySelector(`[id="${listidentifier}"]`);    
         var prevValue = document.querySelector('input[name="workStatus"]').value;
         var dupList = document.querySelector(`[id="${listidentifier}"]`).cloneNode(true)
@@ -26,7 +25,6 @@ function startValidation(inputSelector, listidentifier) {
                 if (prevValue.length > 1) {
                  clickMe(nodeList, prevValue);
                 } else {
-
                     searchNodeList(nodeList, textValue);   
                 }
             } 
